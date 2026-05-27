@@ -3,63 +3,60 @@ from pygame.locals import QUIT,KEYDOWN
 
 clock = pygame.time.Clock()
 
-hero_img = pygame.image.load('assets/Hero_walk_01.png')
+Flip = False
+run_animation= False
 
-run_animation = False
-#tem que ter uma dessas 3 variaveis para cada animção
-curr_frame = 0
-anim_time = 0
-hero_walk_list = []
-for i in range(4):
-    hero_walk_list.append(pygame.image.load(f'assets/Hero_walk_0{i+1}.png'))
-
+pos_x = 0
 curr_frame_mm = 0
 anim_time_mm = 0
-mm_spritesheet = pygame.image.load('megaman_spritesheet.png')
-
-
-
+mm_spritesheet = pygame.image.load('player.png')
+mm_flip = pygame.transform.flip(mm_spritesheet,True,False)
+hero = mm_spritesheet
 
 
 pygame.init()
-screen = pygame.display.set_mode((800,600))
+screen = pygame.display.set_mode((700,500))
 pygame.display.set_caption('Hello world!')
-
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                run_animation = True
+            if event.key == pygame.K_a:
+                hero = mm_flip
+            if event.key == pygame.K_d:
+                hero = mm_spritesheet
+        
+            
     clock.tick(60)
     dt = clock.get_time()
-    anim_time+=dt
-    anim_time_sec = anim_time/1000
+    keys = pygame.key.get_pressed()
 
-    
-    if anim_time_sec > 0.15:
-        curr_frame+=1
-        if curr_frame > len(hero_walk_list)-1:
-            curr_frame = 0
-        anim_time = 0
-    
+    if keys[pygame.K_d]:
+        pos_x+=2
+        run_animation = True
+        
+
+    if keys[pygame.K_a]:
+        pos_x-=2
+        run_animation = True
+
+
     if run_animation:
         anim_time_mm+=dt
-        anim_time_sec_mm = anim_time_mm/1000
-        if anim_time_sec_mm > 0.05:
+        anim_time_sec_mm = anim_time_mm/500
+        if anim_time_sec_mm > 0.1:
             curr_frame_mm+=1
-            if curr_frame_mm > 9:
+            if curr_frame_mm > 10:
                 curr_frame_mm = 0
                 run_animation = False
             anim_time_mm = 0    
+            
     #Desenho dos elementos 
     screen.fill((255,255,255))
 
-    screen.blit(hero_walk_list[curr_frame],(0,0))
-
-    screen.blit(mm_spritesheet,(200,200),(60*(curr_frame_mm % 5),60*(curr_frame_mm // 5),60, 60))
+    screen.blit(hero,(200+pos_x,200),(48*(curr_frame_mm%6),50,60,60))
 
 
     pygame.display.update()
